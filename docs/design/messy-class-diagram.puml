@@ -1,0 +1,163 @@
+@startuml Messy Wardrobe Tracker Class Diagram
+
+title Personal Wardrobe Tracker - MESSY PROTOTYPE CLASS DIAGRAM\n(Intentionally Poor Design for Milestone 2)
+
+' This diagram shows the intentionally poor design with violations of SOLID principles
+
+package "wardrobe" {
+    
+    ' THE GOD CLASS - Does everything!
+    class WardrobeApp {
+        ' === DATA STORAGE (should be separate) ===
+        - items: ArrayList<String[]>
+        - outfits: ArrayList<String[]>
+        - usageLogs: ArrayList<String[]>
+        - DATA_FILE: String {static final}
+        
+        ' === UI COMPONENTS (should be separate) ===
+        - tabbedPane: JTabbedPane
+        - itemTable: JTable
+        - itemTableModel: DefaultTableModel
+        - outfitTable: JTable
+        - outfitTableModel: DefaultTableModel
+        - analyticsArea: JTextArea
+        
+        ' === CONSTRUCTOR ===
+        + WardrobeApp()
+        
+        ' === UI INITIALIZATION (should be separate) ===
+        - initUI(): void
+        - createItemsPanel(): JPanel
+        - createOutfitsPanel(): JPanel
+        - createUsagePanel(): JPanel
+        - createAnalyticsPanel(): JPanel
+        - createSearchPanel(): JPanel
+        
+        ' === ITEM MANAGEMENT (should be in separate class) ===
+        - addItemDialog(): void
+        - editItemDialog(): void
+        - deleteItem(): void
+        - refreshItemTable(): void
+        
+        ' === OUTFIT MANAGEMENT (should be in separate class) ===
+        - createOutfitDialog(): void
+        - deleteOutfit(): void
+        - refreshOutfitTable(): void
+        
+        ' === USAGE TRACKING (should be in separate class) ===
+        - logItemUsage(JTextArea): void
+        - logOutfitUsage(JTextArea): void
+        - displayUsageHistory(JTextArea): void
+        
+        ' === ANALYTICS (should be in separate class) ===
+        - calculateAndDisplayAnalytics(): void
+        
+        ' === FILE I/O (should be in separate repository class) ===
+        - saveDataToFile(): void
+        - loadDataFromFile(): void
+        
+        ' === MAIN ===
+        + {static} main(String[]): void
+    }
+    
+    note right of WardrobeApp
+        **MASSIVE GOD CLASS**
+        
+        Violations:
+        • Single Responsibility Principle
+          - Handles UI rendering
+          - Handles business logic
+          - Handles data persistence
+          - Handles analytics calculations
+        
+        • Open/Closed Principle
+          - Hardcoded filter logic
+          - Hardcoded categories
+          - Can't extend without modification
+        
+        • Liskov Substitution
+          - No inheritance hierarchy
+        
+        • Interface Segregation
+          - No interfaces defined
+        
+        • Dependency Inversion
+          - Depends on concrete Swing classes
+          - Depends on concrete file system
+          - No abstractions anywhere
+        
+        Other Issues:
+        • Tight coupling everywhere
+        • Code duplication (add/edit dialogs)
+        • Poor data structures (String arrays!)
+        • No validation abstraction
+        • No proper domain models
+        • Business logic in UI handlers
+        • 1000+ lines in single class
+    end note
+    
+    ' External dependencies (concrete implementations only!)
+    WardrobeApp ..> JFrame : extends
+    WardrobeApp ..> ArrayList : uses
+    WardrobeApp ..> JTabbedPane : uses
+    WardrobeApp ..> JTable : uses
+    WardrobeApp ..> DefaultTableModel : uses
+    WardrobeApp ..> JTextArea : uses
+    WardrobeApp ..> JPanel : creates
+    WardrobeApp ..> JDialog : creates
+    WardrobeApp ..> JButton : creates
+    WardrobeApp ..> JTextField : creates
+    WardrobeApp ..> JComboBox : creates
+    WardrobeApp ..> FileWriter : uses directly
+    WardrobeApp ..> FileReader : uses directly
+    WardrobeApp ..> BufferedWriter : uses directly
+    WardrobeApp ..> BufferedReader : uses directly
+}
+
+note as N1
+    **What's Wrong With This Design?**
+    
+    1. **God Class Anti-Pattern**
+       - WardrobeApp does literally everything
+       - Over 1000 lines of code in one class
+       - Impossible to test individual components
+    
+    2. **No Abstraction**
+       - Data stored as String arrays (not objects)
+       - No Item, Outfit, or UsageLog classes
+       - No interfaces for extensibility
+    
+    3. **Tight Coupling**
+       - UI directly manipulates data structures
+       - Business logic embedded in event handlers
+       - File I/O mixed with business logic
+    
+    4. **No Separation of Concerns**
+       - Presentation, business, and data layers all mixed
+       - Can't change UI without risking business logic
+       - Can't change storage without touching UI
+    
+    5. **Hardcoded Logic**
+       - Filter types hardcoded with if-else chains
+       - Categories hardcoded in dropdown arrays
+       - Can't add new filters without modifying code
+    
+    6. **Code Duplication**
+       - Add and Edit dialogs share 90% code
+       - Validation logic repeated everywhere
+       - Table refresh logic duplicated
+    
+    7. **Poor Error Handling**
+       - Catches exceptions but just prints stack traces
+       - No recovery mechanisms
+       - No validation abstraction
+    
+    8. **Fragile Data Persistence**
+       - Custom text format with | delimiter
+       - No version control
+       - String parsing can easily break
+       - No transaction support
+end note
+
+@enduml
+

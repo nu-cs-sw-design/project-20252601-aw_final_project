@@ -1,0 +1,134 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+title Personal Wardrobe Tracker - Clean Design
+
+' Domain Model
+class ClothingItem {
+  +name, category
+  +color, season
+  +occasion
+}
+
+class Outfit {
+  +name
+  +items: List
+}
+
+class UsageLog {
+  +date
+  +items: List
+}
+
+Outfit o-- ClothingItem
+UsageLog o-- ClothingItem
+
+' Repository Pattern
+interface ItemRepository <<interface>> {
+  +save(), findAll()
+}
+
+class FileItemRepository
+
+FileItemRepository ..|> ItemRepository
+
+' Strategy Pattern - Filters
+interface ItemFilter <<interface>> {
+  +matches(): boolean
+}
+
+class CategoryFilter
+class SeasonFilter
+class CompositeFilter
+
+CategoryFilter ..|> ItemFilter
+SeasonFilter ..|> ItemFilter
+CompositeFilter ..|> ItemFilter
+
+' Strategy Pattern - Analytics
+interface AnalyticsCalculator <<interface>> {
+  +calculate()
+}
+
+class AnalyticsService {
+  +runAllAnalytics()
+}
+
+AnalyticsService o-- AnalyticsCalculator
+
+' Service Layer
+class ItemService {
+  -repository
+  -validator
+  +addItem()
+  +searchItems()
+}
+
+class OutfitService {
+  -repository
+  +createOutfit()
+}
+
+ItemService --> ItemRepository
+ItemService --> ItemFilter
+
+' MVC - Controller
+class ItemController {
+  -service
+  -view
+  +onAddItem()
+}
+
+ItemController --> ItemService
+ItemController --> ItemView
+
+' MVC - View
+interface ItemView <<interface>> {
+  +displayItems()
+}
+
+class SwingItemView
+
+SwingItemView ..|> ItemView
+
+note top of ClothingItem
+  **Model Layer**
+  Domain objects with
+  proper encapsulation
+end note
+
+note right of ItemRepository
+  **Repository Pattern**
+  Abstracts data persistence.
+  Can swap implementations.
+end note
+
+note right of ItemFilter
+  **Strategy Pattern**
+  Extensible filtering.
+  New filters = new classes.
+end note
+
+note right of AnalyticsCalculator
+  **Strategy Pattern**
+  Extensible analytics.
+  Add calculations easily.
+end note
+
+note bottom of ItemService
+  **Service Layer**
+  Business logic.
+  Coordinates repositories
+  and validators.
+end note
+
+note bottom of ItemController
+  **MVC Pattern**
+  Controller coordinates
+  between service and view.
+  View abstracted by interface.
+end note
+
+@enduml
+
